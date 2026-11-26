@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studio Portfolio — Dinamis Berbasis CV</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- PDF.js untuk ekstraksi PDF langsung di browser secara offline/mandiri -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    .font-display {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+    .font-sans-modern {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: flex;
+      width: max-content;
+      animation: marqueeScroll 28s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+    .reveal-section {
+      opacity: 0;
+      transform: translateY(2.5rem);
+      transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="font-sans-modern min-h-screen transition-colors duration-500 selection:bg-amber-400 selection:text-zinc-950 bg-[#09090B] text-[#F4F4F5]">
+
+  <!-- PRELOADER ELEGAN -->
+  <div id="preloader" class="fixed inset-0 z-[10000] flex flex-col items-center justify-center transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] bg-zinc-950 text-zinc-100">
+    <div class="w-64 sm:w-80 space-y-4">
+      <div class="flex justify-between items-end font-mono text-xs tracking-widest uppercase opacity-70">
+        <span>Memuat Studio Portfolio</span>
+        <span id="preloader-percent">0%</span>
+      </div>
+      <div id="preloader-track" class="h-[2px] w-full overflow-hidden rounded-full bg-zinc-800">
+        <div id="preloader-bar" class="h-full transition-all duration-200 ease-out bg-amber-400" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM CURSOR -->
+  <div id="cursor-dot" class="hidden fixed top-0 left-0 w-2 h-2 rounded-full pointer-events-none z-[9999] transition-opacity duration-300 bg-amber-400"></div>
+  <div id="cursor-ring" class="hidden fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9998] transition-all duration-300 ease-out border border-amber-400/50 bg-amber-400/5"></div>
+
+  <!-- STICKY NAVBAR PREMIUM -->
+  <header id="navbar" class="sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-500 bg-[#09090B]/80 border-zinc-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between gap-4">
+      <!-- Logo / Nama di Kiri -->
+      <a href="#" class="flex items-center gap-3 group focus:outline-none">
+        <div id="nav-avatar" class="w-9 h-9 rounded-full flex items-center justify-center font-display text-lg font-bold transition-transform duration-300 group-hover:scale-105 bg-amber-400 text-zinc-950">
+          P
+        </div>
+        <div class="flex flex-col">
+          <span id="nav-name" class="font-sans-modern font-semibold text-sm sm:text-base tracking-tight leading-none">
+            Studio Portfolio
+          </span>
+          <span id="nav-domain" class="hidden text-[11px] uppercase tracking-widest mt-1 text-zinc-400"></span>
+        </div>
+      </a>
+
+      <!-- Navigasi Tengah -->
+      <nav id="nav-links" class="hidden md:flex items-center gap-7"></nav>
+
+      <!-- Kontrol Aksi di Kanan -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a id="btn-download-cv-nav" href="#" download class="hidden flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all duration-300 bg-emerald-600 hover:bg-emerald-500 text-white" title="Unduh Dokumen CV Asli">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Download CV</span>
+        </a>
+
+        <button id="btn-back-home" onclick="resetToHome()" class="hidden flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-medium border transition-all duration-300 border-zinc-700 hover:border-amber-400/70 bg-zinc-900/70 text-zinc-200" title="Buat / Direktori Portfolio">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Direktori</span>
+        </button>
+
+        <button id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Toggle Mode Gelap/Terang" class="p-2.5 rounded-full border transition-all duration-300 border-zinc-800 bg-zinc-900 text-amber-400 hover:bg-zinc-800">
+          <i id="icon-sun" data-lucide="sun" class="w-4 h-4"></i>
+          <i id="icon-moon" data-lucide="moon" class="w-4 h-4 hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Input File Tersembunyi -->
+  <input id="cv-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md" onchange="handleFileUpload(event)" class="hidden" />
+
+  <!-- =====================================================================
+       MODE 1: ONBOARDING STUDIO & PENYIMPANAN MULTI-USER GITHUB
+  ====================================================================== -->
+  <main id="onboarding-view" class="font-sans-modern max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 py-14 sm:py-20">
+    <div class="text-center max-w-3xl mx-auto space-y-6">
+      <div id="badge-accuracy" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase border border-amber-400/30 bg-amber-400/10 text-amber-300">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+        <span>Multi-User GitHub Storage • 100% Akurat Berdasarkan CV</span>
+      </div>
+
+      <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08]">
+        Ubah CV Anda Menjadi
+        <span class="italic font-normal text-amber-500">Portfolio Eksekutif</span>
+        Otomatis.
+      </h1>
+
+      <p id="hero-subtitle" class="text-base sm:text-lg leading-relaxed max-w-2xl mx-auto text-zinc-400">
+        Setiap pengguna mendapatkan folder penyimpanan & tautan portfolio permanen. Pengunjung dapat langsung melihat portfolio rapi serta mengunduh file CV asli tanpa mengubah tata letak.
+      </p>
+    </div>
+
+    <!-- Identitas Folder Pengguna (Tanpa Meminta Token ke Pengunjung) -->
+    <div class="mt-10 max-w-2xl mx-auto space-y-6">
+      <div id="github-config-card" class="p-6 sm:p-7 rounded-3xl border border-zinc-800 bg-zinc-900/50 space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-amber-400">
+            <i data-lucide="folder-git-2" class="w-4 h-4"></i>
+            <span>Identitas Folder Portfolio Anda</span>
+          </h2>
+          <span id="repo-target-label" class="text-[11px] font-mono opacity-60"></span>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-mono uppercase tracking-wider opacity-70">Username / Nama Folder Unik *</label>
+          <input id="gh-username-slug" type="text" placeholder="contoh: budi-santoso" oninput="sanitizeSlugInput(this)" class="w-full px-4 py-3 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-400 bg-zinc-950 border-zinc-800 text-zinc-100" />
+          <p class="text-[11px] opacity-50">Folder penyimpanan: <span class="font-mono">portfolios/<span id="slug-preview">username</span>/</span></p>
+        </div>
+      </div>
+
+      <!-- Kartu Dropzone Unggah CV -->
+      <div id="dropzone-card" onclick="triggerFileInput()" class="relative group cursor-pointer rounded-3xl border-2 border-dashed p-10 sm:p-12 text-center transition-all duration-500 border-zinc-800 hover:border-amber-400/70 bg-zinc-900/40 hover:bg-zinc-900/80">
+        <!-- State Idle -->
+        <div id="dropzone-idle" class="space-y-4">
+          <div id="dropzone-icon-box" class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 bg-zinc-800 text-amber-400">
+            <i data-lucide="upload" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold">Unggah CV & Simpan Otomatis</h3>
+            <p class="text-sm mt-1.5 text-zinc-400">
+              Mendukung PDF, JPG, PNG, WEBP, atau TXT (File CV asli ikut tersimpan & bisa diunduh)
+            </p>
+          </div>
+          <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
+            <span id="btn-upload-label" class="px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide uppercase transition-all bg-amber-400 text-zinc-950 group-hover:bg-amber-300">
+              Pilih File CV
+            </span>
+            <button type="button" id="btn-open-paste" onclick="event.stopPropagation(); openPasteModal()" class="px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide uppercase border transition-all border-zinc-700 text-zinc-300 hover:border-zinc-500">
+              Tempel Teks CV
+            </button>
+          </div>
+        </div>
+
+        <!-- State Loading -->
+        <div id="dropzone-loading" class="hidden space-y-4 py-4">
+          <i data-lucide="loader-2" class="w-10 h-10 animate-spin mx-auto text-amber-400"></i>
+          <h3 id="loading-title" class="text-lg font-semibold">Mengekstrak & Menyimpan Portfolio...</h3>
+          <p id="loading-desc" class="text-sm text-zinc-400">
+            Menyusun folder rapi serta menyimpan data portfolio dan file CV asli.
+          </p>
+        </div>
+      </div>
+
+      <!-- Kotak Error / Opsi Fallback & API Key -->
+      <div id="error-box" class="hidden mt-4 p-4 rounded-2xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm space-y-3">
+        <div class="flex items-start gap-3">
+          <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+          <span id="error-message"></span>
+        </div>
+        <div class="pl-8 flex flex-wrap items-center gap-3">
+          <button type="button" onclick="openPasteModal()" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-400 text-zinc-950 hover:bg-amber-300 transition-colors">
+            Gunakan Tempel Teks CV
+          </button>
+          <button type="button" onclick="toggleApiConfig()" id="btn-toggle-api" class="text-xs underline opacity-80 hover:opacity-100">
+            Masukkan Gemini API Key (Opsional)
+          </button>
+        </div>
+        <div id="api-config-box" class="hidden pl-8 pt-1">
+          <input id="custom-api-key" type="password" placeholder="Tempel AIzaSy... API Key Anda lalu unggah ulang PDF/Gambar" class="w-full px-3.5 py-2 rounded-xl text-xs border focus:outline-none bg-zinc-950 border-zinc-800 text-zinc-200" />
+        </div>
+      </div>
+
+      <!-- Direktori Portfolio Tersimpan di GitHub -->
+      <div id="directory-section" class="pt-8 border-t border-zinc-800/60">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xs font-mono uppercase tracking-widest text-amber-400 flex items-center gap-2">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Direktori Portfolio Tersimpan di Repo</span>
+          </h3>
+          <button onclick="loadSavedDirectory()" class="text-xs opacity-60 hover:opacity-100 underline">Segarkan</button>
+        </div>
+        <div id="directory-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+          <p class="text-xs text-zinc-500 col-span-full">Memeriksa folder portfolio tersimpan...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL TEMPEL TEKS CV -->
+  <div id="paste-modal" class="hidden fixed inset-0 z-[999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="paste-modal-card" class="w-full max-w-xl rounded-3xl p-6 sm:p-8 border shadow-2xl bg-zinc-900 border-zinc-800 text-zinc-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <i data-lucide="file-text" class="w-5 h-5 text-amber-400"></i>
+          <span>Tempel Isi Teks CV Anda</span>
+        </h3>
+        <button onclick="closePasteModal()" class="text-sm opacity-60 hover:opacity-100 px-2 py-1">
+          Tutup
+        </button>
+      </div>
+      <textarea id="raw-cv-textarea" rows="9" placeholder="Salin dan tempel seluruh isi CV Anda di sini (Nama, Ringkasan, Pengalaman, Keahlian, Proyek, Pendidikan, Kontak)..." class="w-full rounded-2xl p-4 text-sm border focus:outline-none focus:ring-2 focus:ring-amber-400 bg-zinc-950 border-zinc-800 text-zinc-200 placeholder-zinc-600"></textarea>
+      <div class="mt-5 flex justify-end gap-3">
+        <button onclick="closePasteModal()" class="px-4 py-2.5 rounded-full text-xs font-medium opacity-70 hover:opacity-100">
+          Batal
+        </button>
+        <button id="btn-submit-paste" onclick="submitPastedText()" class="px-6 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all bg-amber-400 text-zinc-950 hover:bg-amber-300">
+          Bangun Portfolio
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODE 2: HALAMAN PORTFOLIO DINAMIS
+  ====================================================================== -->
+  <main id="portfolio-view" class="hidden font-sans-modern"></main>
+
+  <script>
+    // Konfigurasi Worker PDF.js agar PDF dapat dibaca secara mandiri di browser
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    /**
+     * KONFIGURASI REPOSITORY GITHUB OTOMATIS
+     * Pemilik repo cukup mengisi DEFAULT_GITHUB_TOKEN (opsional) di bawah ini agar
+     * pengunjung dapat langsung menyimpan ke folder portfolios/{username}/ tanpa perlu token.
+     */
+    const DEFAULT_GITHUB_TOKEN = '';
+
+    const GITHUB_CONFIG = (() => {
+      const host = window.location.hostname;
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      if (host.endsWith('.github.io')) {
+        return {
+          owner: host.split('.')[0],
+          repo: pathParts[0] || 'cvrepost',
+          branch: 'main'
+        };
+      }
+      return {
+        owner: 'Skyzo-himonoto',
+        repo: 'cvrepost',
+        branch: 'main'
+      };
+    })();
+
+    let isDark = true;
+    let portfolioData = null;
+    let currentFileName = '';
+    let currentCvDownloadUrl = '';
+    let activeUserSlug = '';
+
+    // Inisialisasi Preloader & Cek Parameter URL (?user=...)
+    window.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      initCustomCursor();
+
+      const repoLabel = document.getElementById('repo-target-label');
+      if (repoLabel) repoLabel.textContent = `${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`;
+
+      // Cek apakah URL dibuka dengan ?user=nama_pengguna
+      const params = new URLSearchParams(window.location.search);
+      const userSlug = params.get('user');
+
+      let progress = 0;
+      const bar = document.getElementById('preloader-bar');
+      const pct = document.getElementById('preloader-percent');
+      const preloader = document.getElementById('preloader');
+
+      const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 20) + 15;
+        if (progress >= 90 && userSlug && !portfolioData) {
+          progress = 92;
+        }
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          setTimeout(() => {
+            preloader.classList.add('-translate-y-full');
+            setTimeout(() => preloader.remove(), 750);
+          }, 150);
+        } else {
+          bar.style.width = progress + '%';
+          pct.textContent = progress + '%';
+        }
+      }, 50);
+
+      if (userSlug) {
+        await loadUserPortfolioFromGitHub(userSlug);
+        progress = 100;
+      } else {
+        loadSavedDirectory();
+      }
+    });
+
+    function sanitizeSlugInput(input) {
+      const clean = input.value.toLowerCase().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
+      input.value = clean;
+      document.getElementById('slug-preview').textContent = clean || 'username';
+    }
+
+    function resetToHome() {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('user');
+      window.history.pushState({}, '', url);
+      portfolioData = null;
+      activeUserSlug = '';
+      currentCvDownloadUrl = '';
+      document.getElementById('portfolio-view').classList.add('hidden');
+      document.getElementById('onboarding-view').classList.remove('hidden');
+      document.getElementById('btn-download-cv-nav').classList.add('hidden');
+      document.getElementById('btn-back-home').classList.add('hidden');
+      document.getElementById('nav-name').textContent = 'Studio Portfolio';
+      document.getElementById('nav-avatar').textContent = 'P';
+      document.getElementById('nav-domain').classList.add('hidden');
+      document.getElementById('nav-links').innerHTML = '';
+      loadSavedDirectory();
+    }
+
+    /**
+     * SKEMA JSON STRICT NO-HALLUCINATION UNTUK EKSTRAKSI CV
+     */
+    const CV_EXTRACTION_SCHEMA = {
+      type: "OBJECT",
+      properties: {
+        fullName: { type: "STRING" },
+        headline: { type: "STRING" },
+        professionalDomain: { type: "STRING" },
+        heroTagline: { type: "STRING" },
+        aboutSummary: { type: "STRING" },
+        location: {
+          type: "OBJECT",
+          properties: {
+            cityCountry: { type: "STRING" },
+            fullAddress: { type: "STRING" },
+            googleMapsEmbedUrl: { type: "STRING" }
+          }
+        },
+        contact: {
+          type: "OBJECT",
+          properties: {
+            email: { type: "STRING" },
+            phone: { type: "STRING" },
+            whatsappNumber: { type: "STRING" },
+            website: { type: "STRING" },
+            linkedin: { type: "STRING" },
+            github: { type: "STRING" },
+            instagram: { type: "STRING" },
+            behanceOrDribbble: { type: "STRING" }
+          }
+        },
+        skillsAndServices: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              title: { type: "STRING" },
+              category: { type: "STRING" },
+              details: { type: "STRING" }
+            }
+          }
+        },
+        experiences: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              role: { type: "STRING" },
+              company: { type: "STRING" },
+              period: { type: "STRING" },
+              location: { type: "STRING" },
+              highlights: { type: "ARRAY", items: { type: "STRING" } }
+            }
+          }
+        },
+        projects: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              title: { type: "STRING" },
+              roleOrCategory: { type: "STRING" },
+              year: { type: "STRING" },
+              description: { type: "STRING" },
+              technologiesOrTools: { type: "ARRAY", items: { type: "STRING" } },
+              link: { type: "STRING" }
+            }
+          }
+        },
+        education: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              degree: { type: "STRING" },
+              institution: { type: "STRING" },
+              period: { type: "STRING" },
+              notes: { type: "STRING" }
+            }
+          }
+        },
+        testimonialsOrReferences: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              author: { type: "STRING" },
+              roleOrCompany: { type: "STRING" },
+              quoteOrContact: { type: "STRING" }
+            }
+          }
+        },
+        marqueeKeywords: { type: "ARRAY", items: { type: "STRING" } }
+      },
+      required: ["fullName", "headline", "skillsAndServices", "experiences", "projects", "education", "testimonialsOrReferences"]
+    };
+
+    // Custom Cursor
+    function initCustomCursor() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+      const dot = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
+      let mouseX = 0, mouseY = 0, followerX = 0, followerY = 0, hovered = false;
+
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        dot.classList.remove('hidden');
+        ring.classList.remove('hidden');
+        dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+        hovered = Boolean(e.target.closest('a, button, input, textarea'));
+        ring.style.width = hovered ? '48px' : '32px';
+        ring.style.height = hovered ? '48px' : '32px';
+      });
+
+      document.addEventListener('mouseleave', () => {
+        dot.classList.add('hidden');
+        ring.classList.add('hidden');
+      });
+
+      function animate() {
+        followerX += (mouseX - followerX) * 0.14;
+        followerY += (mouseY - followerY) * 0.14;
+        const offset = hovered ? 24 : 16;
+        ring.style.transform = `translate3d(${followerX - offset}px, ${followerY - offset}px, 0)`;
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // Toggle Dark / Light Mode
+    function toggleTheme() {
+      isDark = !isDark;
+      document.body.className = `font-sans-modern min-h-screen transition-colors duration-500 selection:bg-amber-400 selection:text-zinc-950 ${
+        isDark ? 'bg-[#09090B] text-[#F4F4F5]' : 'bg-[#FAF9F6] text-[#18181B]'
+      }`;
+
+      const navbar = document.getElementById('navbar');
+      navbar.className = `sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-500 ${
+        isDark ? 'bg-[#09090B]/80 border-zinc-800/80' : 'bg-[#FAF9F6]/85 border-zinc-200/80'
+      }`;
+
+      document.getElementById('nav-avatar').className = `w-9 h-9 rounded-full flex items-center justify-center font-display text-lg font-bold transition-transform duration-300 group-hover:scale-105 ${
+        isDark ? 'bg-amber-400 text-zinc-950' : 'bg-zinc-900 text-amber-300'
+      }`;
+
+      document.getElementById('btn-theme-toggle').className = `p-2.5 rounded-full border transition-all duration-300 ${
+        isDark ? 'border-zinc-800 bg-zinc-900 text-amber-400 hover:bg-zinc-800' : 'border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-100'
+      }`;
+
+      document.getElementById('icon-sun').classList.toggle('hidden', !isDark);
+      document.getElementById('icon-moon').classList.toggle('hidden', isDark);
+
+      const dropzone = document.getElementById('dropzone-card');
+      if (dropzone) {
+        dropzone.className = `relative group cursor-pointer rounded-3xl border-2 border-dashed p-10 sm:p-12 text-center transition-all duration-500 ${
+          isDark ? 'border-zinc-800 hover:border-amber-400/70 bg-zinc-900/40 hover:bg-zinc-900/80' : 'border-zinc-300 hover:border-zinc-900 bg-white hover:bg-zinc-50/80 shadow-sm'
+        }`;
+      }
+
+      if (portfolioData) {
+        renderPortfolio();
+      } else {
+        loadSavedDirectory();
+      }
+    }
+
+    function triggerFileInput() {
+      document.getElementById('cv-file-input').click();
+    }
+
+    function openPasteModal() {
+      document.getElementById('paste-modal').classList.remove('hidden');
+    }
+
+    function closePasteModal() {
+      document.getElementById('paste-modal').classList.add('hidden');
+    }
+
+    function toggleApiConfig() {
+      const box = document.getElementById('api-config-box');
+      box.classList.toggle('hidden');
+    }
+
+    function setLoadingState(loading, customTitle = '', customDesc = '') {
+      document.getElementById('dropzone-idle').classList.toggle('hidden', loading);
+      document.getElementById('dropzone-loading').classList.toggle('hidden', !loading);
+      if (customTitle) document.getElementById('loading-title').textContent = customTitle;
+      if (customDesc) document.getElementById('loading-desc').textContent = customDesc;
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('error-box');
+      document.getElementById('error-message').textContent = msg;
+      box.classList.remove('hidden');
+    }
+
+    function hideError() {
+      document.getElementById('error-box').classList.add('hidden');
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          const base64String = reader.result.split(',')[1];
+          resolve(base64String);
+        };
+        reader.onerror = (error) => reject(error);
+      });
+    }
+
+    async function handleFileUpload(e) {
+      const selectedFile = e.target.files?.[0];
+      if (!selectedFile) return;
+
+      currentFileName = selectedFile.name;
+
+      if (selectedFile.type === 'text/plain' || selectedFile.name.endsWith('.txt') || selectedFile.name.endsWith('.md')) {
+        const textContent = await selectedFile.text();
+        await processCvContent({ file: selectedFile, plainText: textContent });
+      } else {
+        await processCvContent({ file: selectedFile });
+      }
+    }
+
+    // Ekstraksi Teks dari PDF secara Lokal via PDF.js (sebagai fallback offline untuk file PDF)
+    async function extractTextFromPdfLocally(file) {
+      if (!window.pdfjsLib) return '';
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map(item => item.str);
+        fullText += strings.join('\n') + '\n';
+      }
+      return fullText;
+    }
+
+    // Parser Lokal Deterministik (100% Tanpa API / Zero-Hallucination)
+    function parseCvTextLocally(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const phoneMatch = text.match(/(\+?\d[\d\s\-()]{8,16}\d)/);
+      const urlMatches = text.match(/https?:\/\/[^\s)]+|(?:www\.|linkedin\.com\/in\/|github\.com\/|instagram\.com\/)[^\s)]+/gi) || [];
+
+      const linkedin = urlMatches.find(u => u.toLowerCase().includes('linkedin.com')) || '';
+      const github = urlMatches.find(u => u.toLowerCase().includes('github.com')) || '';
+      const instagram = urlMatches.find(u => u.toLowerCase().includes('instagram.com')) || '';
+      const googleMapsEmbedUrl = urlMatches.find(u => u.toLowerCase().includes('google.com/maps') || u.toLowerCase().includes('goo.gl/maps')) || '';
+      const website = urlMatches.find(u =>
+        !u.toLowerCase().includes('linkedin.com') &&
+        !u.toLowerCase().includes('github.com') &&
+        !u.toLowerCase().includes('instagram.com') &&
+        !u.toLowerCase().includes('google.com/maps')
+      ) || '';
+
+      const rawPhone = phoneMatch ? phoneMatch[0].trim() : '';
+      const cleanWa = rawPhone ? rawPhone.replace(/[^0-9]/g, '').replace(/^0/, '62') : '';
+
+      const fullName = lines[0] && lines[0].length < 60 ? lines[0] : 'Kandidat Profesional';
+      const headline = lines[1] && !lines[1].includes('@') && lines[1].length < 80 ? lines[1] : '';
+
+      const sectionPatterns = {
+        about: /^(tentang|profil|ringkasan|summary|about|profile|objective|objektif)/i,
+        skills: /^(keahlian|skill|skills|kemampuan|layanan|services|kompetensi|technical skills|tools)/i,
+        experience: /^(pengalaman|experience|work experience|riwayat pekerjaan|karir|organisasi)/i,
+        projects: /^(proyek|project|projects|portofolio|portfolio|karya|publikasi)/i,
+        education: /^(pendidikan|education|akademik|riwayat pendidikan)/i,
+        testimonials: /^(testimoni|testimonial|referensi|references|rekomendasi)/i,
+      };
+
+      const buckets = {
+        about: [],
+        skills: [],
+        experience: [],
+        projects: [],
+        education: [],
+        testimonials: [],
+      };
+
+      let currentBucket = 'about';
+      for (let i = headline ? 2 : 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.includes('@') || (rawPhone && line.includes(rawPhone))) continue;
+
+        let matchedHeader = false;
+        for (const [key, regex] of Object.entries(sectionPatterns)) {
+          if (regex.test(line) && line.length < 45) {
+            currentBucket = key;
+            matchedHeader = true;
+            break;
+          }
+        }
+        if (!matchedHeader) {
+          buckets[currentBucket].push(line);
+        }
+      }
+
+      const skillsAndServices = buckets.skills
+        .join(', ')
+        .split(/[,•|·]/)
+        .map(s => s.trim())
+        .filter(s => s.length > 1 && s.length < 60)
+        .slice(0, 18)
+        .map(title => ({ title, category: '', details: '' }));
+
+      const experiences = buckets.experience.length
+        ? [{
+            role: buckets.experience[0],
+            company: buckets.experience[1] || '',
+            period: '',
+            location: '',
+            highlights: buckets.experience.slice(2),
+          }]
+        : [];
+
+      const projects = buckets.projects.length
+        ? [{
+            title: buckets.projects[0],
+            roleOrCategory: '',
+            year: '',
+            description: buckets.projects.slice(1).join(' '),
+            technologiesOrTools: [],
+            link: '',
+          }]
+        : [];
+
+      const education = buckets.education.length
+        ? [{
+            degree: buckets.education[0],
+            institution: buckets.education[1] || '',
+            period: '',
+            notes: buckets.education.slice(2).join(' '),
+          }]
+        : [];
+
+      const testimonialsOrReferences = buckets.testimonials.length
+        ? [{
+            author: buckets.testimonials[0],
+            roleOrCompany: buckets.testimonials[1] || '',
+            quoteOrContact: buckets.testimonials.slice(2).join(' ') || buckets.testimonials[0],
+          }]
+        : [];
+
+      return {
+        fullName,
+        headline,
+        professionalDomain: '',
+        heroTagline: buckets.about[0] || '',
+        aboutSummary: buckets.about.join(' '),
+        location: { cityCountry: '', fullAddress: '', googleMapsEmbedUrl },
+        contact: {
+          email: emailMatch ? emailMatch[0] : '',
+          phone: rawPhone,
+          whatsappNumber: cleanWa,
+          website,
+          linkedin,
+          github,
+          instagram,
+          behanceOrDribbble: '',
+        },
+        skillsAndServices,
+        experiences,
+        projects,
+        education,
+        testimonialsOrReferences,
+        marqueeKeywords: skillsAndServices.slice(0, 8).map(s => s.title),
+      };
+    }
+
+    /**
+     * HELPER GITHUB REST API: BACA & SIMPAN FILE TERSTRUKTUR DI REPO
+     */
+    function utf8ToBase64(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    async function uploadFileToGitHub({ path, base64Content, message, token, allowOverwrite = false }) {
+      const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      };
+
+      // Cek apakah folder/file sudah ada agar tidak sembarangan menimpa portfolio pengguna lain
+      let existingSha = null;
+      try {
+        const checkRes = await fetch(`${apiUrl}?ref=${GITHUB_CONFIG.branch}`, { headers });
+        if (checkRes.ok) {
+          const existingData = await checkRes.json();
+          if (!allowOverwrite) {
+            throw new Error('Username folder ini sudah digunakan oleh pengguna lain. Silakan pilih username unik lain.');
+          }
+          existingSha = existingData.sha;
+        }
+      } catch (e) {
+        if (e.message.includes('sudah digunakan')) throw e;
+      }
+
+      const body = {
+        message,
+        content: base64Content,
+        branch: GITHUB_CONFIG.branch
+      };
+      if (existingSha) body.sha = existingSha;
+
+      const putRes = await fetch(apiUrl, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(body)
+      });
+
+      if (!putRes.ok) {
+        const err = await putRes.json();
+        throw new Error(err.message || 'Gagal menyimpan file ke GitHub.');
+      }
+      return await putRes.json();
+    }
+
+    async function savePortfolioToGitHub(slug, dataObj, rawFile = null, rawTextFallback = '') {
+      const token = DEFAULT_GITHUB_TOKEN.trim();
+      if (!token) {
+        throw new Error('Token penyimpanan server belum dikonfigurasi pada kode.');
+      }
+
+      const folderPath = `portfolios/${slug}`;
+      let savedCvFileName = '';
+      let rawDownloadUrl = '';
+
+      // 1. Simpan File CV Asli (PDF/Gambar/TXT) ke dalam folder pengguna agar bisa didownload pengunjung
+      if (rawFile) {
+        const cleanFileName = rawFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        savedCvFileName = cleanFileName;
+        const fileBase64 = await fileToBase64(rawFile);
+        await uploadFileToGitHub({
+          path: `${folderPath}/${cleanFileName}`,
+          base64Content: fileBase64,
+          message: `Upload CV asli untuk ${slug}`,
+          token,
+          allowOverwrite: false
+        });
+        rawDownloadUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${folderPath}/${cleanFileName}`;
+      } else if (rawTextFallback) {
+        savedCvFileName = `CV_${slug}.txt`;
+        await uploadFileToGitHub({
+          path: `${folderPath}/${savedCvFileName}`,
+          base64Content: utf8ToBase64(rawTextFallback),
+          message: `Simpan teks CV untuk ${slug}`,
+          token,
+          allowOverwrite: false
+        });
+        rawDownloadUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${folderPath}/${savedCvFileName}`;
+      }
+
+      // 2. Simpan Metadata & Konten Portfolio ke portfolios/{slug}/data.json
+      const payloadToSave = {
+        ...dataObj,
+        _meta: {
+          slug,
+          cvFileName: savedCvFileName,
+          cvDownloadUrl: rawDownloadUrl,
+          updatedAt: new Date().toISOString()
+        }
+      };
+
+      await uploadFileToGitHub({
+        path: `${folderPath}/data.json`,
+        base64Content: utf8ToBase64(JSON.stringify(payloadToSave, null, 2)),
+        message: `Simpan portfolio data untuk ${slug}`,
+        token,
+        allowOverwrite: false
+      });
+
+      return payloadToSave;
+    }
+
+    // Memuat Portfolio Pengguna Secara Otomatis dari GitHub saat membuka ?user=slug
+    async function loadUserPortfolioFromGitHub(slug) {
+      const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+      const rawJsonUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/portfolios/${cleanSlug}/data.json?t=${Date.now()}`;
+
+      try {
+        const res = await fetch(rawJsonUrl);
+        if (!res.ok) {
+          showError(`Portfolio untuk pengguna "${cleanSlug}" belum ditemukan di repository.`);
+          loadSavedDirectory();
+          return;
+        }
+        const data = await res.json();
+        portfolioData = data;
+        activeUserSlug = cleanSlug;
+        currentFileName = data._meta?.cvFileName || 'Dokumen CV';
+        currentCvDownloadUrl = data._meta?.cvDownloadUrl || '';
+        renderPortfolio();
+      } catch (err) {
+        showError(`Gagal memuat data portfolio "${cleanSlug}" dari GitHub.`);
+        loadSavedDirectory();
+      }
+    }
+
+    // Memuat Daftar Folder Pengguna yang Sudah Tersimpan di Repo GitHub
+    async function loadSavedDirectory() {
+      const listEl = document.getElementById('directory-list');
+      if (!listEl) return;
+
+      try {
+        const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/portfolios?ref=${GITHUB_CONFIG.branch}`;
+        const res = await fetch(apiUrl);
+        if (!res.ok) {
+          listEl.innerHTML = `<p class="text-xs text-zinc-500 col-span-full">Belum ada folder portfolio tersimpan. Jadilah yang pertama membuat portfolio di atas!</p>`;
+          return;
+        }
+        const items = await res.json();
+        const folders = Array.isArray(items) ? items.filter(item => item.type === 'dir') : [];
+
+        if (folders.length === 0) {
+          listEl.innerHTML = `<p class="text-xs text-zinc-500 col-span-full">Belum ada portfolio tersimpan di folder portfolios/.</p>`;
+          return;
+        }
+
+        listEl.innerHTML = folders.map(dir => `
+          <a href="?user=${encodeURIComponent(dir.name)}" class="flex items-center justify-between p-4 rounded-2xl border transition-all ${
+            isDark ? 'border-zinc-800 bg-zinc-900/50 hover:border-amber-400/60' : 'border-zinc-200 bg-white hover:border-zinc-900'
+          }">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center font-display font-bold text-sm bg-amber-400 text-zinc-950">
+                ${dir.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p class="text-sm font-semibold">${escapeHtml(dir.name)}</p>
+                <p class="text-[11px] font-mono opacity-60">portfolios/${escapeHtml(dir.name)}/</p>
+              </div>
+            </div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-amber-400"></i>
+          </a>
+        `).join('');
+        lucide.createIcons();
+      } catch (e) {
+        listEl.innerHTML = `<p class="text-xs text-zinc-500 col-span-full">Tidak dapat memuat daftar direktori saat ini.</p>`;
+      }
+    }
+
+    async function processCvContent({ file = null, plainText = '' }) {
+      const slugInput = document.getElementById('gh-username-slug').value.trim();
+      if (!slugInput) {
+        showError('Harap isi "Username / Nama Folder Unik" terlebih dahulu sebelum mengunggah CV.');
+        document.getElementById('gh-username-slug').focus();
+        return;
+      }
+
+      setLoadingState(true, 'Mengekstrak Fakta dari CV...', 'Membaca isi dokumen CV tanpa menambah informasi palsu.');
+      hideError();
+
+      const systemInstruction = `
+Anda adalah parser data CV berpresisi tinggi. Tugas Anda adalah mengekstrak informasi dari CV yang diberikan ke dalam format JSON terstruktur.
+ATURAN MUTLAK:
+1. HANYA ekstrak informasi yang benar-benar tertulis di dalam CV.
+2. DILARANG KERAS mengarang, menebak, menambahkan proyek fiktif, membuat testimoni palsu, atau membuat tautan Google Maps/sosial media yang tidak ada di CV.
+3. Jika sebuah bagian tidak tercantum di dalam CV, kembalikan string kosong ("") atau array kosong ([]).
+      `.trim();
+
+      let extractedData = null;
+
+      try {
+        const parts = [];
+        if (file) {
+          const base64Data = await fileToBase64(file);
+          parts.push({ text: "Ekstrak seluruh informasi faktual dari dokumen CV terlampir ke dalam skema JSON yang ditentukan." });
+          parts.push({ inlineData: { mimeType: file.type || 'application/pdf', data: base64Data } });
+        } else if (plainText.trim()) {
+          parts.push({ text: `Ekstrak seluruh informasi faktual dari teks CV berikut:\n\n${plainText}` });
+        }
+
+        const apiKey = document.getElementById('custom-api-key').value.trim();
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts }],
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            generationConfig: {
+              responseMimeType: 'application/json',
+              responseSchema: CV_EXTRACTION_SCHEMA,
+              temperature: 0.1
+            }
+          })
+        });
+
+        if (!res.ok) throw new Error('API tidak tersedia tanpa kunci');
+        const result = await res.json();
+        const rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawJson) throw new Error('Respons tidak valid');
+
+        extractedData = JSON.parse(rawJson);
+      } catch (err) {
+        // Fallback Offline Otomatis: Mendukung Teks Langsung maupun Ekstraksi Teks PDF Lokal!
+        let fallbackText = plainText;
+        if (!fallbackText && file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
+          try {
+            fallbackText = await extractTextFromPdfLocally(file);
+          } catch (pdfErr) {
+            fallbackText = '';
+          }
+        }
+
+        if (fallbackText && fallbackText.trim()) {
+          extractedData = parseCvTextLocally(fallbackText);
+        } else {
+          setLoadingState(false);
+          showError('Untuk membaca file gambar (JPG/PNG) tanpa teks, masukkan Gemini API Key Anda di bawah, atau gunakan tombol "Tempel Teks CV" / unggah PDF berbasis teks.');
+          return;
+        }
+      }
+
+      // Simpan otomatis ke folder GitHub: portfolios/{slug}/
+      try {
+        setLoadingState(true, 'Menyimpan ke Folder GitHub...', `Mengunggah data.json & file CV ke portfolios/${slugInput}/`);
+        const savedPayload = await savePortfolioToGitHub(slugInput, extractedData, file, plainText);
+
+        portfolioData = savedPayload;
+        activeUserSlug = slugInput;
+        currentCvDownloadUrl = savedPayload._meta?.cvDownloadUrl || '';
+
+        // Perbarui URL browser menjadi ?user=slug agar langsung bisa dibagikan & dibuka kapan saja!
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('user', slugInput);
+        window.history.pushState({}, '', nextUrl);
+
+        closePasteModal();
+        renderPortfolio();
+      } catch (ghErr) {
+        if (ghErr.message.includes('sudah digunakan')) {
+          setLoadingState(false);
+          showError(ghErr.message);
+          return;
+        }
+
+        // Jika token GitHub belum diset oleh pemilik repo, tetap tampilkan portfolio & siapkan unduhan CV langsung
+        portfolioData = extractedData;
+        activeUserSlug = slugInput;
+        if (file) {
+          currentCvDownloadUrl = URL.createObjectURL(file);
+        } else if (plainText) {
+          currentCvDownloadUrl = URL.createObjectURL(new Blob([plainText], { type: 'text/plain' }));
+        }
+        closePasteModal();
+        renderPortfolio();
+      } finally {
+        setLoadingState(false);
+      }
+    }
+
+    function submitPastedText() {
+      const text = document.getElementById('raw-cv-textarea').value;
+      if (!text.trim()) return;
+      currentFileName = 'Teks CV';
+      processCvContent({ plainText: text });
+    }
+
+    function isValidMapsUrl(url) {
+      if (!url || typeof url !== 'string') return false;
+      const trimmed = url.trim();
+      return trimmed.startsWith('https://www.google.com/maps/embed') ||
+             trimmed.startsWith('https://maps.google.com/') ||
+             trimmed.startsWith('https://goo.gl/maps/');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const targetEmail = portfolioData?.contact?.email;
+      const name = document.getElementById('contact-name').value;
+      const email = document.getElementById('contact-email').value;
+      const subjectVal = document.getElementById('contact-subject').value;
+      const message = document.getElementById('contact-message').value;
+
+      if (targetEmail) {
+        const subject = encodeURIComponent(subjectVal || `Pesan Portfolio dari ${name}`);
+        const body = encodeURIComponent(`Halo ${portfolioData?.fullName || ''},\n\nNama: ${name}\nEmail: ${email}\n\nPesan:\n${message}`);
+        window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+      }
+      document.getElementById('contact-sent-msg').classList.remove('hidden');
+    }
+
+    // RENDER HALAMAN PORTFOLIO LENGKAP DARI DATA CV
+    function renderPortfolio() {
+      if (!portfolioData) return;
+
+      document.getElementById('onboarding-view').classList.add('hidden');
+      const mainView = document.getElementById('portfolio-view');
+      mainView.classList.remove('hidden');
+      document.getElementById('btn-back-home').classList.remove('hidden');
+
+      // Tampilkan tombol Download CV di Navbar jika tersedia
+      const navDownloadBtn = document.getElementById('btn-download-cv-nav');
+      if (currentCvDownloadUrl) {
+        navDownloadBtn.href = currentCvDownloadUrl;
+        navDownloadBtn.setAttribute('download', currentFileName || 'CV.pdf');
+        navDownloadBtn.classList.remove('hidden');
+      } else {
+        navDownloadBtn.classList.add('hidden');
+      }
+
+      // Update Navbar
+      document.getElementById('nav-avatar').textContent = (portfolioData.fullName || 'P').charAt(0).toUpperCase();
+      document.getElementById('nav-name').textContent = portfolioData.fullName || 'Studio Portfolio';
+      const domainEl = document.getElementById('nav-domain');
+      if (portfolioData.professionalDomain) {
+        domainEl.textContent = portfolioData.professionalDomain;
+        domainEl.classList.remove('hidden');
+      } else {
+        domainEl.classList.add('hidden');
+      }
+
+      const navItems = [
+        { id: 'tentang', label: 'Tentang', show: Boolean(portfolioData.aboutSummary || portfolioData.education?.length) },
+        { id: 'keahlian', label: 'Keahlian', show: Boolean(portfolioData.skillsAndServices?.length) },
+        { id: 'pengalaman', label: 'Pengalaman', show: Boolean(portfolioData.experiences?.length) },
+        { id: 'proyek', label: 'Karya & Proyek', show: Boolean(portfolioData.projects?.length) },
+        { id: 'testimoni', label: 'Referensi', show: Boolean(portfolioData.testimonialsOrReferences?.length) },
+        { id: 'kontak', label: 'Kontak', show: true }
+      ].filter(i => i.show);
+
+      document.getElementById('nav-links').innerHTML = navItems.map(item => `
+        <a href="#${item.id}" class="text-xs uppercase tracking-[0.16em] font-medium transition-colors duration-200 ${
+          isDark ? 'text-zinc-400 hover:text-amber-400' : 'text-zinc-600 hover:text-zinc-950'
+        }">${item.label}</a>
+      `).join('');
+
+      let html = '';
+
+      // 1. HERO SECTION
+      html += `
+        <section class="relative overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-32 border-b border-zinc-800/30">
+          <div class="pointer-events-none absolute -top-32 right-0 w-[480px] h-[480px] rounded-full blur-[130px] opacity-20 ${isDark ? 'bg-amber-500' : 'bg-amber-300'}"></div>
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="reveal-section">
+              <div class="flex flex-wrap items-center gap-3 mb-8">
+                ${portfolioData.location?.cityCountry ? `
+                  <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border ${isDark ? 'border-zinc-800 bg-zinc-900/70 text-zinc-300' : 'border-zinc-200 bg-white text-zinc-700'}">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i>
+                    ${escapeHtml(portfolioData.location.cityCountry)}
+                  </span>
+                ` : ''}
+                ${currentFileName ? `
+                  <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs border ${isDark ? 'border-zinc-800/80 text-zinc-500' : 'border-zinc-200 text-zinc-500'}">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i>
+                    Sumber: ${escapeHtml(currentFileName)}
+                  </span>
+                ` : ''}
+              </div>
+
+              <h1 class="font-display text-5xl sm:text-7xl lg:text-[5.5rem] font-semibold tracking-tight leading-[1.03] max-w-5xl">
+                ${escapeHtml(portfolioData.fullName || 'Profil Profesional')}
+              </h1>
+
+              ${portfolioData.headline ? `
+                <p class="mt-4 font-display italic text-2xl sm:text-4xl text-amber-500">
+                  ${escapeHtml(portfolioData.headline)}
+                </p>
+              ` : ''}
+
+              ${portfolioData.heroTagline ? `
+                <p class="mt-8 text-base sm:text-xl leading-relaxed max-w-2xl ${isDark ? 'text-zinc-400' : 'text-zinc-600'}">
+                  ${escapeHtml(portfolioData.heroTagline)}
+                </p>
+              ` : ''}
+
+              <div class="mt-10 flex flex-wrap items-center gap-4">
+                <a href="#kontak" class="inline-flex items-center gap-2.5 px-7 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.02] ${
+                  isDark ? 'bg-amber-400 text-zinc-950 hover:bg-amber-300' : 'bg-zinc-900 text-white hover:bg-zinc-800'
+                }">
+                  <span>Hubungi Saya</span>
+                  <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                </a>
+                ${currentCvDownloadUrl ? `
+                  <a href="${escapeHtml(currentCvDownloadUrl)}" download="${escapeHtml(currentFileName || 'CV.pdf')}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-7 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all duration-300 bg-emerald-600 hover:bg-emerald-500 text-white">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Download CV Asli</span>
+                  </a>
+                ` : ''}
+                ${portfolioData.projects?.length > 0 ? `
+                  <a href="#proyek" class="inline-flex items-center gap-2 px-7 py-4 rounded-full text-xs font-semibold uppercase tracking-widest border transition-all duration-300 ${
+                    isDark ? 'border-zinc-700 hover:border-zinc-500 text-zinc-200' : 'border-zinc-300 hover:border-zinc-900 text-zinc-800'
+                  }">
+                    <span>Lihat Karya & Proyek</span>
+                  </a>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      // 2. MARQUEE TEKS BERJALAN
+      if (portfolioData.marqueeKeywords?.length > 0) {
+        const doubled = [...portfolioData.marqueeKeywords, ...portfolioData.marqueeKeywords];
+        html += `
+          <div class="py-5 border-b overflow-hidden select-none ${isDark ? 'border-zinc-800/80 bg-zinc-900/40 text-zinc-300' : 'border-zinc-200 bg-zinc-100/70 text-zinc-700'}">
+            <div class="animate-marquee flex items-center gap-10">
+              ${doubled.map(w => `
+                <div class="flex items-center gap-10 whitespace-nowrap">
+                  <span class="font-display italic text-2xl sm:text-3xl tracking-wide">${escapeHtml(w)}</span>
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // 3. TENTANG SAYA & PENDIDIKAN
+      if (portfolioData.aboutSummary || portfolioData.education?.length > 0) {
+        html += `
+          <section id="tentang" class="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="reveal-section grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+              <div class="lg:col-span-4">
+                <span class="text-xs font-mono uppercase tracking-[0.2em] text-amber-500">01 / Profil</span>
+                <h2 class="font-display text-3xl sm:text-5xl font-semibold mt-3">Tentang Saya</h2>
+              </div>
+              <div class="lg:col-span-8 space-y-10">
+                ${portfolioData.aboutSummary ? `
+                  <p class="text-lg sm:text-2xl leading-relaxed font-light ${isDark ? 'text-zinc-200' : 'text-zinc-800'}">
+                    ${escapeHtml(portfolioData.aboutSummary)}
+                  </p>
+                ` : ''}
+
+                ${portfolioData.education?.length > 0 ? `
+                  <div class="pt-6 border-t border-zinc-800/30">
+                    <h3 class="text-xs font-mono uppercase tracking-widest opacity-60 mb-6 flex items-center gap-2">
+                      <i data-lucide="graduation-cap" class="w-4 h-4 text-amber-400"></i>
+                      <span>Latar Belakang Pendidikan</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      ${portfolioData.education.map(edu => `
+                        <div class="p-5 rounded-2xl border ${isDark ? 'border-zinc-800 bg-zinc-900/40' : 'border-zinc-200 bg-white'}">
+                          ${edu.period ? `<span class="text-xs font-mono text-amber-500">${escapeHtml(edu.period)}</span>` : ''}
+                          <h4 class="font-semibold text-base mt-1">${escapeHtml(edu.degree)}</h4>
+                          <p class="text-sm mt-1 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}">${escapeHtml(edu.institution)}</p>
+                          ${edu.notes ? `<p class="text-xs mt-2 text-zinc-500">${escapeHtml(edu.notes)}</p>` : ''}
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      // 4. KEAHLIAN / LAYANAN
+      if (portfolioData.skillsAndServices?.length > 0) {
+        html += `
+          <section id="keahlian" class="py-20 sm:py-28 border-t ${isDark ? 'border-zinc-800/60 bg-zinc-900/20' : 'border-zinc-200/80 bg-zinc-100/40'}">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+              <div class="reveal-section">
+                <div class="mb-14">
+                  <span class="text-xs font-mono uppercase tracking-[0.2em] text-amber-500">02 / Kapabilitas</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-semibold mt-3">Keahlian & Layanan</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  ${portfolioData.skillsAndServices.map((skill, idx) => `
+                    <div class="group p-7 rounded-3xl border transition-all duration-300 hover:-translate-y-1 ${
+                      isDark ? 'border-zinc-800 bg-[#09090B] hover:border-amber-400/50' : 'border-zinc-200 bg-white hover:border-zinc-900 shadow-sm'
+                    }">
+                      <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-mono opacity-50">${String(idx + 1).padStart(2, '0')}</span>
+                        ${skill.category ? `<span class="text-[11px] px-2.5 py-0.5 rounded-full ${isDark ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-700'}">${escapeHtml(skill.category)}</span>` : ''}
+                      </div>
+                      <h3 class="text-lg font-semibold group-hover:text-amber-500 transition-colors">${escapeHtml(skill.title)}</h3>
+                      ${skill.details ? `<p class="text-sm mt-2.5 leading-relaxed ${isDark ? 'text-zinc-400' : 'text-zinc-600'}">${escapeHtml(skill.details)}</p>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      // 5. PENGALAMAN PROFESIONAL
+      if (portfolioData.experiences?.length > 0) {
+        html += `
+          <section id="pengalaman" class="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="reveal-section">
+              <div class="mb-14">
+                <span class="text-xs font-mono uppercase tracking-[0.2em] text-amber-500">03 / Rekam Jejak</span>
+                <h2 class="font-display text-3xl sm:text-5xl font-semibold mt-3">Pengalaman Kerja & Organisasi</h2>
+              </div>
+              <div class="space-y-8">
+                ${portfolioData.experiences.map(exp => `
+                  <div class="p-7 sm:p-9 rounded-3xl border transition-all ${isDark ? 'border-zinc-800 bg-zinc-900/30' : 'border-zinc-200 bg-white shadow-sm'}">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-5 border-b border-zinc-800/30">
+                      <div>
+                        <h3 class="text-xl sm:text-2xl font-semibold">${escapeHtml(exp.role)}</h3>
+                        <p class="text-amber-500 font-medium mt-1">${escapeHtml(exp.company)}${exp.location ? ` • ${escapeHtml(exp.location)}` : ''}</p>
+                      </div>
+                      ${exp.period ? `<span class="self-start sm:self-center px-3.5 py-1.5 rounded-full text-xs font-mono ${isDark ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-700'}">${escapeHtml(exp.period)}</span>` : ''}
+                    </div>
+                    ${exp.highlights?.length > 0 ? `
+                      <ul class="mt-5 space-y-2.5">
+                        ${exp.highlights.map(pt => `
+                          <li class="flex items-start gap-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-zinc-300' : 'text-zinc-700'}">
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-amber-500 shrink-0 mt-1"></i>
+                            <span>${escapeHtml(pt)}</span>
+                          </li>
+                        `).join('')}
+                      </ul>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      // 6. PROYEK / KARYA TERPILIH
+      if (portfolioData.projects?.length > 0) {
+        html += `
+          <section id="proyek" class="py-20 sm:py-28 border-t ${isDark ? 'border-zinc-800/60 bg-zinc-900/20' : 'border-zinc-200/80 bg-zinc-100/40'}">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+              <div class="reveal-section">
+                <div class="mb-14">
+                  <span class="text-xs font-mono uppercase tracking-[0.2em] text-amber-500">04 / Portofolio Karya</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-semibold mt-3">Proyek & Pencapaian</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  ${portfolioData.projects.map((proj, idx) => `
+                    <article class="group relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 ${
+                      isDark ? 'border-zinc-800 bg-[#09090B] hover:border-amber-400/60' : 'border-zinc-200 bg-white hover:border-zinc-900 hover:shadow-xl'
+                    }">
+                      <div>
+                        <div class="flex items-center justify-between gap-4 mb-5">
+                          <span class="text-xs font-mono uppercase tracking-wider text-amber-500">${escapeHtml(proj.roleOrCategory || `Karya #${idx + 1}`)}</span>
+                          ${proj.year ? `<span class="text-xs font-mono opacity-60">${escapeHtml(proj.year)}</span>` : ''}
+                        </div>
+                        <h3 class="font-display text-2xl sm:text-3xl font-semibold group-hover:text-amber-500 transition-colors">${escapeHtml(proj.title)}</h3>
+                        ${proj.description ? `<p class="mt-4 text-sm sm:text-base leading-relaxed ${isDark ? 'text-zinc-400' : 'text-zinc-600'}">${escapeHtml(proj.description)}</p>` : ''}
+                      </div>
+                      <div class="mt-8 pt-6 border-t border-zinc-800/30 flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex flex-wrap gap-2">
+                          ${(proj.technologiesOrTools || []).map(t => `<span class="px-3 py-1 rounded-full text-xs ${isDark ? 'bg-zinc-900 text-zinc-300 border border-zinc-800' : 'bg-zinc-100 text-zinc-700'}">${escapeHtml(t)}</span>`).join('')}
+                        </div>
+                        ${proj.link ? `
+                          <a href="${proj.link.startsWith('http') ? escapeHtml(proj.link) : 'https://' + escapeHtml(proj.link)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-500 hover:underline">
+                            <span>Tinjau</span>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                          </a>
+                        ` : ''}
+                      </div>
+                    </article>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      // 7. TESTIMONI / REFERENSI
+      if (portfolioData.testimonialsOrReferences?.length > 0) {
+        html += `
+          <section id="testimoni" class="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="reveal-section">
+              <div class="mb-14">
+                <span class="text-xs font-mono uppercase tracking-[0.2em] text-amber-500">05 / Validasi</span>
+                <h2 class="font-display text-3xl sm:text-5xl font-semibold mt-3">Testimoni & Referensi</h2>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                ${portfolioData.testimonialsOrReferences.map(item => `
+                  <div class="p-8 rounded-3xl border ${isDark ? 'border-zinc-800 bg-zinc-900/40' : 'border-zinc-200 bg-white'}">
+                    <p class="font-display italic text-xl sm:text-2xl leading-relaxed">“${escapeHtml(item.quoteOrContact)}”</p>
+                    <div class="mt-6 pt-4 border-t border-zinc-800/30">
+                      <p class="font-semibold text-sm">${escapeHtml(item.author)}</p>
+                      ${item.roleOrCompany ? `<p class="text-xs mt-0.5 ${isDark ? 'text-zinc-400' : 'text-zinc-500'}">${escapeHtml(item.roleOrCompany)}</p>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      // 8. HUBUNGI SAYA & FOOTER
+      const c = portfolioData.contact || {};
+      const loc = portfolioData.location || {};
+      const waClean = c.whatsappNumber ? c.whatsappNumber.replace(/[^0-9]/g, '') : '';
+
+      html += `
+        <section id="kontak" class="py-24 sm:py-32 border-t ${isDark ? 'border-zinc-800 bg-[#070709]' : 'border-zinc-200 bg-[#F3F1EC]'}">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="reveal-section grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+              <div class="lg:col-span-5 space-y-8">
+                <div>
+                  <span class="text-xs font-mono uppercase tracking-[0.2em] text-amber-500">Mari Berkolaborasi</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-semibold mt-3 leading-tight">Hubungi Saya</h2>
+                  <p class="mt-4 text-base leading-relaxed ${isDark ? 'text-zinc-400' : 'text-zinc-600'}">
+                    Tertarik untuk berdiskusi mengenai proyek, peluang kerja, atau kolaborasi profesional? Silakan hubungi melalui saluran resmi di bawah ini.
+                  </p>
+                </div>
+
+                <div class="space-y-4">
+                  ${c.email ? `
+                    <a href="mailto:${escapeHtml(c.email)}" class="flex items-center gap-4 p-4 rounded-2xl border transition-colors ${isDark ? 'border-zinc-800 bg-zinc-900/50 hover:border-amber-400/50' : 'border-zinc-200 bg-white hover:border-zinc-900'}">
+                      <i data-lucide="mail" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                      <div class="overflow-hidden">
+                        <span class="text-[11px] uppercase tracking-wider opacity-60 block">Email</span>
+                        <span class="text-sm font-medium truncate block">${escapeHtml(c.email)}</span>
+                      </div>
+                    </a>
+                  ` : ''}
+
+                  ${c.phone ? `
+                    <div class="flex items-center gap-4 p-4 rounded-2xl border ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-white'}">
+                      <i data-lucide="phone" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                      <div>
+                        <span class="text-[11px] uppercase tracking-wider opacity-60 block">Telepon</span>
+                        <span class="text-sm font-medium">${escapeHtml(c.phone)}</span>
+                      </div>
+                    </div>
+                  ` : ''}
+
+                  ${(loc.fullAddress || loc.cityCountry) ? `
+                    <div class="flex items-start gap-4 p-4 rounded-2xl border ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-white'}">
+                      <i data-lucide="map-pin" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
+                      <div>
+                        <span class="text-[11px] uppercase tracking-wider opacity-60 block">Lokasi</span>
+                        <span class="text-sm font-medium">${escapeHtml(loc.fullAddress || loc.cityCountry)}</span>
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+
+                ${waClean ? `
+                  <div>
+                    <a href="https://wa.me/${waClean}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition-all">
+                      <i data-lucide="message-square" class="w-4 h-4"></i>
+                      <span>Chat via WhatsApp</span>
+                    </a>
+                  </div>
+                ` : ''}
+
+                <div class="flex flex-wrap gap-3 pt-2">
+                  ${c.linkedin ? `<a href="${c.linkedin.startsWith('http') ? escapeHtml(c.linkedin) : 'https://' + escapeHtml(c.linkedin)}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-full border transition-colors ${isDark ? 'border-zinc-800 hover:border-amber-400 text-zinc-300' : 'border-zinc-300 hover:border-zinc-900 text-zinc-700'}" aria-label="LinkedIn"><i data-lucide="linkedin" class="w-4 h-4"></i></a>` : ''}
+                  ${c.github ? `<a href="${c.github.startsWith('http') ? escapeHtml(c.github) : 'https://' + escapeHtml(c.github)}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-full border transition-colors ${isDark ? 'border-zinc-800 hover:border-amber-400 text-zinc-300' : 'border-zinc-300 hover:border-zinc-900 text-zinc-700'}" aria-label="GitHub"><i data-lucide="github" class="w-4 h-4"></i></a>` : ''}
+                  ${c.instagram ? `<a href="${c.instagram.startsWith('http') ? escapeHtml(c.instagram) : 'https://' + escapeHtml(c.instagram)}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-full border transition-colors ${isDark ? 'border-zinc-800 hover:border-amber-400 text-zinc-300' : 'border-zinc-300 hover:border-zinc-900 text-zinc-700'}" aria-label="Instagram"><i data-lucide="instagram" class="w-4 h-4"></i></a>` : ''}
+                  ${c.website ? `<a href="${c.website.startsWith('http') ? escapeHtml(c.website) : 'https://' + escapeHtml(c.website)}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-full border transition-colors ${isDark ? 'border-zinc-800 hover:border-amber-400 text-zinc-300' : 'border-zinc-300 hover:border-zinc-900 text-zinc-700'}" aria-label="Website"><i data-lucide="globe" class="w-4 h-4"></i></a>` : ''}
+                </div>
+
+                ${isValidMapsUrl(loc.googleMapsEmbedUrl) ? `
+                  <div class="pt-4">
+                    <div class="rounded-2xl overflow-hidden border border-zinc-800 h-56 w-full">
+                      <iframe src="${escapeHtml(loc.googleMapsEmbedUrl)}" title="Lokasi Peta" class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- Form Kontak -->
+              <div class="lg:col-span-7">
+                <form onsubmit="handleContactSubmit(event)" class="p-8 sm:p-10 rounded-3xl border space-y-6 ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-white shadow-sm'}">
+                  <h3 class="font-display text-2xl sm:text-3xl font-semibold">Kirim Pesan Langsung</h3>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="space-y-2">
+                      <label class="text-xs font-mono uppercase tracking-wider opacity-70">Nama Lengkap</label>
+                      <input id="contact-name" type="text" required placeholder="Masukkan nama Anda" class="w-full px-4 py-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-400 ${isDark ? 'bg-zinc-950 border-zinc-800 text-zinc-100' : 'bg-zinc-50 border-zinc-300 text-zinc-900'}" />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-xs font-mono uppercase tracking-wider opacity-70">Alamat Email</label>
+                      <input id="contact-email" type="email" required placeholder="nama@domain.com" class="w-full px-4 py-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-400 ${isDark ? 'bg-zinc-950 border-zinc-800 text-zinc-100' : 'bg-zinc-50 border-zinc-300 text-zinc-900'}" />
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-xs font-mono uppercase tracking-wider opacity-70">Subjek Diskusi</label>
+                    <input id="contact-subject" type="text" required placeholder="Kolaborasi Proyek / Tawaran Kerja / Konsultasi" class="w-full px-4 py-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-400 ${isDark ? 'bg-zinc-950 border-zinc-800 text-zinc-100' : 'bg-zinc-50 border-zinc-300 text-zinc-900'}" />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-xs font-mono uppercase tracking-wider opacity-70">Pesan</label>
+                    <textarea id="contact-message" rows="5" required placeholder="Tuliskan detail kebutuhan atau pesan Anda di sini..." class="w-full px-4 py-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-400 ${isDark ? 'bg-zinc-950 border-zinc-800 text-zinc-100' : 'bg-zinc-50 border-zinc-300 text-zinc-900'}"></textarea>
+                  </div>
+                  <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+                    <button type="submit" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all ${isDark ? 'bg-amber-400 text-zinc-950 hover:bg-amber-300' : 'bg-zinc-900 text-white hover:bg-zinc-800'}">
+                      <i data-lucide="send" class="w-4 h-4"></i>
+                      <span>Kirim Pesan</span>
+                    </button>
+                    <span id="contact-sent-msg" class="hidden text-xs text-emerald-500 flex items-center gap-1.5">
+                      <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                      Pesan siap dikirim melalui klien email Anda.
+                    </span>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="py-10 border-t text-xs ${isDark ? 'border-zinc-900 bg-[#050507] text-zinc-500' : 'border-zinc-200 bg-white text-zinc-500'}">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© ${new Date().getFullYear()} ${escapeHtml(portfolioData.fullName || 'Portfolio Pribadi')}. Seluruh konten bersumber langsung dari dokumen CV resmi.</p>
+            <a href="#" class="uppercase tracking-widest hover:text-amber-500 transition-colors">Kembali ke Atas ↑</a>
+          </div>
+        </footer>
+      `;
+
+      mainView.innerHTML = html;
+      lucide.createIcons();
+      initScrollReveal();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function initScrollReveal() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.reveal-section').forEach(el => observer.observe(el));
+    }
+  </script>
+</body>
+</html>
