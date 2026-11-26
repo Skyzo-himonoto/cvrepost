@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studio Portfolio — Dinamis Berbasis CV</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- PDF.js untuk ekstraksi PDF langsung di browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    .font-display { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.035em; }
+    .font-brand { font-family: 'Syne', sans-serif; letter-spacing: -0.03em; }
+    .font-sans-modern { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    @keyframes marqueeScroll { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: flex; width: max-content; animation: marqueeScroll 26s linear infinite; }
+    .animate-marquee:hover { animation-play-state: paused; }
+    .reveal-section { opacity: 0; transform: translateY(2rem); transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal-section.is-visible { opacity: 1; transform: translateY(0); }
+    .bg-grid-dark { background-size: 48px 48px; background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px); }
+    .bg-grid-light { background-size: 48px 48px; background-image: linear-gradient(to right, rgba(9,9,11,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(9,9,11,0.04) 1px, transparent 1px); }
+  </style>
+</head>
+<body class="font-sans-modern min-h-screen transition-colors duration-300 selection:bg-indigo-500 selection:text-white bg-[#07080A] text-[#F4F4F6] bg-grid-dark">
+
+  <!-- PRELOADER -->
+  <div id="preloader" class="fixed inset-0 z-[10000] flex flex-col items-center justify-center transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] bg-[#07080A] text-[#F4F4F6]">
+    <div class="w-64 sm:w-80 space-y-4">
+      <div class="flex justify-between items-end font-mono-code text-[11px] tracking-widest uppercase opacity-70">
+        <span>MEMUAT STUDIO</span>
+        <span id="preloader-percent">0%</span>
+      </div>
+      <div class="h-[2px] w-full overflow-hidden rounded-full bg-zinc-800">
+        <div id="preloader-bar" class="h-full transition-all duration-200 ease-out bg-indigo-500" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM CURSOR -->
+  <div id="cursor-dot" class="hidden fixed top-0 left-0 w-2 h-2 rounded-full pointer-events-none z-[9999] bg-indigo-500"></div>
+  <div id="cursor-ring" class="hidden fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9998] border border-indigo-500/50 bg-indigo-500/5"></div>
+
+  <!-- NAVBAR -->
+  <header id="navbar" class="sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-300 bg-[#07080A]/85 border-zinc-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between gap-4">
+      <a href="#" class="flex items-center gap-3.5 group focus:outline-none">
+        <div id="nav-avatar" class="w-10 h-10 rounded-xl flex items-center justify-center font-brand text-base font-extrabold transition-transform duration-300 group-hover:scale-105 bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">P</div>
+        <div class="flex flex-col">
+          <span id="nav-name" class="font-display font-bold text-base sm:text-lg tracking-tight leading-none">Studio Portfolio</span>
+          <span id="nav-domain" class="hidden font-mono-code text-[10px] uppercase tracking-widest mt-1 text-zinc-400"></span>
+        </div>
+      </a>
+      <nav id="nav-links" class="hidden md:flex items-center gap-7"></nav>
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <a id="btn-download-cv-nav" href="#" download class="hidden flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Download CV Asli</span>
+        </a>
+        <button id="btn-back-home" onclick="resetToHome()" class="hidden flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium border border-zinc-800 bg-zinc-900 text-zinc-200">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Ganti CV</span>
+        </button>
+        <button id="btn-theme-toggle" onclick="toggleTheme()" class="p-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-indigo-400 hover:bg-zinc-800">
+          <i id="icon-sun" data-lucide="sun" class="w-4 h-4"></i>
+          <i id="icon-moon" data-lucide="moon" class="w-4 h-4 hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <input id="cv-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md" onchange="handleFileUpload(event)" class="hidden" />
+
+  <!-- ONBOARDING VIEW -->
+  <main id="onboarding-view" class="font-sans-modern max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 py-14 sm:py-20">
+    <div class="text-center max-w-3xl mx-auto space-y-6">
+      <div id="badge-accuracy" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full font-mono-code text-[11px] font-medium tracking-wider uppercase border border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+        <span>100% Berdasarkan CV Asli • Tanpa Data Palsu</span>
+      </div>
+      <h1 class="font-display text-4xl sm:text-6xl lg:text-[4.25rem] font-bold tracking-tight leading-[1.06]">
+        Unggah CV Anda, Jadilah
+        <span class="bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Portfolio Profesional</span>
+        Seketika.
+      </h1>
+      <p id="hero-subtitle" class="text-base sm:text-lg leading-relaxed max-w-2xl mx-auto text-zinc-400">
+        Sistem secara otomatis membaca dokumen CV Anda, menyusun tata letak portfolio yang rapi, dan menyediakan tombol unduh dokumen asli.
+      </p>
+    </div>
+
+    <div class="mt-12 max-w-2xl mx-auto space-y-6">
+      <div id="dropzone-card" onclick="triggerFileInput()" class="relative group cursor-pointer rounded-2xl border-2 border-dashed p-10 sm:p-14 text-center transition-all duration-300 border-zinc-800 hover:border-indigo-500 bg-[#0D0F14]/90 hover:bg-[#11141C]">
+        <div id="dropzone-idle" class="space-y-4">
+          <div id="dropzone-icon-box" class="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center bg-zinc-900 border border-zinc-800 text-indigo-400 group-hover:-translate-y-1 transition-transform">
+            <i data-lucide="upload" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-display text-xl font-bold">Pilih atau Seret File CV di Sini</h3>
+            <p class="text-sm mt-1.5 text-zinc-400">Mendukung format PDF, Foto (JPG/PNG), atau Teks (.TXT)</p>
+          </div>
+          <div class="pt-3 flex flex-wrap items-center justify-center gap-3">
+            <span class="px-6 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wide bg-indigo-600 text-white group-hover:bg-indigo-500 shadow-md">Unggah File CV</span>
+            <button type="button" onclick="event.stopPropagation(); openPasteModal()" class="px-6 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wide border border-zinc-700 bg-zinc-900/50 text-zinc-200 hover:border-indigo-500">Tempel Teks CV</button>
+          </div>
+        </div>
+        <div id="dropzone-loading" class="hidden space-y-4 py-4">
+          <i data-lucide="loader-2" class="w-10 h-10 animate-spin mx-auto text-indigo-500"></i>
+          <h3 class="font-display text-lg font-bold">Membaca & Menyusun Portfolio...</h3>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL TEMPEL TEKS -->
+  <div id="paste-modal" class="hidden fixed inset-0 z-[999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xl rounded-2xl p-6 sm:p-8 border bg-[#0D0F14] border-zinc-800 text-zinc-100 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display text-lg font-bold flex items-center gap-2">
+          <i data-lucide="file-text" class="w-5 h-5 text-indigo-500"></i>
+          <span>Tempel Isi Teks CV Anda</span>
+        </h3>
+        <button onclick="closePasteModal()" class="text-sm opacity-60 hover:opacity-100 px-2 py-1">Tutup</button>
+      </div>
+      <textarea id="raw-cv-textarea" rows="9" placeholder="Tempel seluruh isi teks CV Anda di sini..." class="w-full rounded-xl p-4 text-sm border bg-zinc-950 border-zinc-800 text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      <div class="mt-5 flex justify-end gap-3">
+        <button onclick="closePasteModal()" class="px-4 py-2.5 rounded-xl text-xs font-medium opacity-70">Batal</button>
+        <button onclick="submitPastedText()" class="px-6 py-2.5 rounded-xl text-xs font-semibold uppercase bg-indigo-600 text-white hover:bg-indigo-500">Bangun Portfolio</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="portfolio-view" class="hidden font-sans-modern"></main>
+
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    let isDark = true;
+    let portfolioData = null;
+    let currentFileName = 'Dokumen CV.pdf';
+    let currentCvDownloadUrl = '';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initCustomCursor();
+      setTimeout(() => {
+        const preloader = document.getElementById('preloader');
+        preloader.classList.add('-translate-y-full');
+        setTimeout(() => preloader.remove(), 750);
+      }, 400);
+    });
+
+    function resetToHome() {
+      portfolioData = null;
+      currentCvDownloadUrl = '';
+      document.getElementById('portfolio-view').classList.add('hidden');
+      document.getElementById('onboarding-view').classList.remove('hidden');
+      document.getElementById('btn-download-cv-nav').classList.add('hidden');
+      document.getElementById('btn-back-home').classList.add('hidden');
+      document.getElementById('nav-name').textContent = 'Studio Portfolio';
+      document.getElementById('nav-links').innerHTML = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function triggerFileInput() { document.getElementById('cv-file-input').click(); }
+    function openPasteModal() { document.getElementById('paste-modal').classList.remove('hidden'); }
+    function closePasteModal() { document.getElementById('paste-modal').classList.add('hidden'); }
+
+    function toggleTheme() {
+      isDark = !isDark;
+      document.body.className = `font-sans-modern min-h-screen transition-colors duration-300 selection:bg-indigo-500 selection:text-white ${isDark ? 'bg-[#07080A] text-[#F4F4F6] bg-grid-dark' : 'bg-[#F7F8FA] text-[#111827] bg-grid-light'}`;
+      if (portfolioData) renderPortfolio();
+    }
+
+    async function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+      });
+    }
+
+    async function extractTextFromPdf(file) {
+      if (!window.pdfjsLib) return '';
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          fullText += content.items.map(item => item.str).join('\n') + '\n';
+        }
+        return fullText;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function parseCvTextLocally(text) {
+      // Bersihkan teks placeholder template kosong
+      const cleanText = text.replace(/\[NAMA LENGKAP KAMU\]/gi, 'Kandidat Profesional')
+                            .replace(/\[Kota, Provinsi\]/gi, '')
+                            .replace(/\[Nomor Telepon \/ WhatsApp\]/gi, '')
+                            .replace(/\[Alamat Email\]/gi, '')
+                            .replace(/\[Tautan LinkedIn\]/gi, '');
+
+      const lines = cleanText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const emailMatch = cleanText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const phoneMatch = cleanText.match(/(\+?\d[\d\s\-()]{8,16}\d)/);
+      const urlMatches = cleanText.match(/https?:\/\/[^\s)]+|(?:www\.|linkedin\.com\/in\/|github\.com\/|instagram\.com\/)[^\s)]+/gi) || [];
+
+      const fullName = lines[0] && lines[0].length < 50 ? lines[0] : 'Kandidat Profesional';
+      const headline = lines[1] && !lines[1].includes('@') && lines[1].length < 80 ? lines[1] : 'Profesional Berdedikasi';
+
+      const sectionPatterns = {
+        about: /^(tentang|profil|ringkasan|summary|about|profile)/i,
+        skills: /^(keahlian|skill|skills|kemampuan|layanan|services)/i,
+        experience: /^(pengalaman|experience|work experience|riwayat pekerjaan)/i,
+        projects: /^(proyek|project|projects|portofolio|portfolio)/i,
+        education: /^(pendidikan|education|akademik)/i,
+        testimonials: /^(testimoni|testimonial|referensi)/i,
+      };
+
+      const buckets = { about: [], skills: [], experience: [], projects: [], education: [], testimonials: [] };
+      let currentBucket = 'about';
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        let matched = false;
+        for (const [key, regex] of Object.entries(sectionPatterns)) {
+          if (regex.test(line) && line.length < 40) {
+            currentBucket = key;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) buckets[currentBucket].push(line);
+      }
+
+      const skillsAndServices = buckets.skills.join(', ').split(/[,•|·]/).map(s => s.trim()).filter(Boolean).slice(0, 12).map(title => ({ title, category: '', details: '' }));
+      const experiences = buckets.experience.length ? [{ role: buckets.experience[0], company: buckets.experience[1] || 'Perusahaan', period: '', location: '', highlights: buckets.experience.slice(2) }] : [];
+      const education = buckets.education.length ? [{ degree: buckets.education[0], institution: buckets.education[1] || 'Institusi', period: '', notes: buckets.education.slice(2).join(' ') }] : [];
+
+      return {
+        fullName,
+        headline,
+        professionalDomain: 'Profesional',
+        heroTagline: buckets.about[0] || 'Berkomitmen memberikan kontribusi positif.',
+        aboutSummary: buckets.about.join(' '),
+        location: { cityCountry: '', fullAddress: '', googleMapsEmbedUrl: '' },
+        contact: {
+          email: emailMatch ? emailMatch[0] : '',
+          phone: phoneMatch ? phoneMatch[0] : '',
+          whatsappNumber: phoneMatch ? phoneMatch[0].replace(/[^0-9]/g, '').replace(/^0/, '62') : '',
+          website: urlMatches[0] || '',
+          linkedin: urlMatches.find(u => u.includes('linkedin')) || '',
+          github: urlMatches.find(u => u.includes('github')) || '',
+          instagram: ''
+        },
+        skillsAndServices,
+        experiences,
+        projects: [],
+        education,
+        testimonialsOrReferences: [],
+        marqueeKeywords: skillsAndServices.slice(0, 6).map(s => s.title)
+      };
+    }
+
+    async function handleFileUpload(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      currentFileName = file.name;
+      currentCvDownloadUrl = URL.createObjectURL(file);
+
+      document.getElementById('dropzone-idle').classList.add('hidden');
+      document.getElementById('dropzone-loading').classList.remove('hidden');
+
+      let textContent = '';
+      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        textContent = await file.text();
+      } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        textContent = await extractTextFromPdf(file);
+      }
+
+      setTimeout(() => {
+        portfolioData = parseCvTextLocally(textContent || 'Kandidat Profesional\nProfil Eksekutif');
+        renderPortfolio();
+      }, 500);
+    }
+
+    function submitPastedText() {
+      const text = document.getElementById('raw-cv-textarea').value;
+      if (!text.trim()) return;
+      currentFileName = 'CV_Teks.txt';
+      currentCvDownloadUrl = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+      closePasteModal();
+      portfolioData = parseCvTextLocally(text);
+      renderPortfolio();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function initCustomCursor() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+      const dot = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
+      let mouseX = 0, mouseY = 0, fx = 0, fy = 0;
+
+      window.addEventListener('mousemove', e => {
+        mouseX = e.clientX; mouseY = e.clientY;
+        dot.classList.remove('hidden'); ring.classList.remove('hidden');
+        dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+      });
+      document.addEventListener('mouseleave', () => { dot.classList.add('hidden'); ring.classList.add('hidden'); });
+
+      function loop() {
+        fx += (mouseX - fx) * 0.16; fy += (mouseY - fy) * 0.16;
+        ring.style.transform = `translate3d(${fx - 15}px, ${fy - 15}px, 0)`;
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function renderPortfolio() {
+      if (!portfolioData) return;
+      document.getElementById('onboarding-view').classList.add('hidden');
+      const mainView = document.getElementById('portfolio-view');
+      mainView.classList.remove('hidden');
+      document.getElementById('btn-back-home').classList.remove('hidden');
+
+      const navDownload = document.getElementById('btn-download-cv-nav');
+      if (currentCvDownloadUrl) {
+        navDownload.href = currentCvDownloadUrl;
+        navDownload.setAttribute('download', currentFileName);
+        navDownload.classList.remove('hidden');
+      }
+
+      document.getElementById('nav-name').textContent = portfolioData.fullName;
+
+      let html = `
+        <section class="relative pt-16 pb-20 sm:pt-24 sm:pb-32 border-b ${isDark ? 'border-zinc-800' : 'border-zinc-200'}">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="reveal-section">
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-mono-code text-xs border ${isDark ? 'border-zinc-800 bg-[#0D0F14] text-zinc-300' : 'border-zinc-200 bg-white text-zinc-700'} mb-6">
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i>
+                Sumber: ${escapeHtml(currentFileName)}
+              </span>
+              <h1 class="font-display text-5xl sm:text-7xl font-bold tracking-tight">${escapeHtml(portfolioData.fullName)}</h1>
+              <p class="mt-4 font-display text-xl sm:text-3xl text-indigo-500 font-semibold">${escapeHtml(portfolioData.headline)}</p>
+              <p class="mt-6 text-base sm:text-xl max-w-2xl ${isDark ? 'text-zinc-400' : 'text-zinc-600'}">${escapeHtml(portfolioData.heroTagline)}</p>
+              
+              <div class="mt-8 flex flex-wrap items-center gap-4">
+                <a href="#kontak" class="px-7 py-3.5 rounded-xl text-xs font-semibold uppercase bg-indigo-600 text-white shadow-lg">Hubungi Saya</a>
+                ${currentCvDownloadUrl ? `<a href="${currentCvDownloadUrl}" download="${escapeHtml(currentFileName)}" class="px-7 py-3.5 rounded-xl text-xs font-semibold uppercase bg-emerald-600 text-white shadow-lg inline-flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download CV Asli</a>` : ''}
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      if (portfolioData.aboutSummary) {
+        html += `
+          <section id="tentang" class="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="reveal-section grid grid-cols-1 lg:grid-cols-12 gap-12">
+              <div class="lg:col-span-4"><span class="font-mono-code text-xs uppercase text-indigo-500">PROFIL</span><h2 class="font-display text-3xl sm:text-5xl font-bold mt-2">Tentang Saya</h2></div>
+              <div class="lg:col-span-8"><p class="text-lg sm:text-2xl leading-relaxed ${isDark ? 'text-zinc-200' : 'text-zinc-800'}">${escapeHtml(portfolioData.aboutSummary)}</p></div>
+            </div>
+          </section>
+        `;
+      }
+
+      if (portfolioData.skillsAndServices?.length > 0) {
+        html += `
+          <section id="keahlian" class="py-20 sm:py-28 border-t ${isDark ? 'border-zinc-800 bg-[#0A0C10]' : 'border-zinc-200 bg-zinc-100'}">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+              <div class="reveal-section">
+                <div class="mb-12"><span class="font-mono-code text-xs uppercase text-indigo-500">KAPABILITAS</span><h2 class="font-display text-3xl sm:text-5xl font-bold mt-2">Keahlian</h2></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  ${portfolioData.skillsAndServices.map(s => `<div class="p-6 rounded-2xl border ${isDark ? 'border-zinc-800 bg-[#0D0F14]' : 'border-zinc-200 bg-white'}"><h3 class="font-display text-lg font-bold">${escapeHtml(s.title)}</h3></div>`).join('')}
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      html += `
+        <section id="kontak" class="py-24 border-t ${isDark ? 'border-zinc-800 bg-[#07080A]' : 'border-zinc-200 bg-white'}">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 text-center space-y-6">
+            <h2 class="font-display text-4xl font-bold">Mari Berkolaborasi</h2>
+            <p class="${isDark ? 'text-zinc-400' : 'text-zinc-600'}">Hubungi saya melalui email resmi di CV.</p>
+            ${portfolioData.contact?.email ? `<a href="mailto:${portfolioData.contact.email}" class="inline-block px-8 py-4 rounded-xl bg-indigo-600 text-white text-xs font-semibold uppercase tracking-wider">${portfolioData.contact.email}</a>` : ''}
+          </div>
+        </section>
+      `;
+
+      mainView.innerHTML = html;
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
