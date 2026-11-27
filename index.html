@@ -76,8 +76,6 @@
         .field:focus { outline: none; box-shadow: 0 0 0 2px rgba(161, 161, 170, 0.5); }
         .lbl { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
 
-        /* ===== Animasi scroll =====
-           Hanya aktif kalau JavaScript berjalan (kelas .js dipasang oleh script) */
         .js .reveal {
             opacity: 0;
             transform: translateY(48px);
@@ -249,7 +247,7 @@
                                     <div id="card-initials" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-zinc-700 to-zinc-900 dark:from-zinc-100 dark:to-zinc-300 flex items-center justify-center font-bold text-lg text-white dark:text-zinc-900 shadow-md">AV</div>
                                     <div>
                                         <h3 id="card-name" class="font-bold text-base dynamic-text">Hydroxy.</h3>
-                                        <p id="card-role" class="text-xs dynamic-muted">Senior Fullstack Developer</p>
+                                        <p id="card-role" class="text-xs dynamic-muted">Portofolio Fullstack Developer</p>
                                     </div>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 text-xs font-semibold">Verified Pro</span>
@@ -449,7 +447,7 @@
 
     <footer class="reveal py-12 border-t dynamic-border text-center text-xs dynamic-muted">
         <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span id="footer-brand">© 2026 Studio Portfolio. All rights reserved.</span>
+            <span id="footer-brand">© 2026 Studio Portfolio All rights reserved.</span>
             <div class="flex items-center space-x-6">
                 <a href="#" class="hover:dynamic-text transition-colors">Privacy Policy</a>
                 <a href="#" class="hover:dynamic-text transition-colors">Terms of Service</a>
@@ -582,7 +580,7 @@
         var portfolioData = {
             name: "Hydroxy.",
             role: "Senior Fullstack Developer & UI/UX Architect",
-            bio: "Berpengalaman lebih dari 5 tahun dalam membangun aplikasi web modern berskala besar dengan performa tinggi dan desain berstandar premium.",
+            bio: "Berpengalaman dalam membangun aplikasi web modern dengan performa tinggi dan desain berstandar premium.",
             location: "Jakarta, Indonesia",
             email: "visi4ura@gmail.com",
             phone: "+62 899-8442-826",
@@ -833,12 +831,12 @@
             from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         const app = initializeApp({
-            apiKey: "AIzaSyDoR9aNMsZG6uB9NaWHKBvbvzkJoSx1Uwc",
-            authDomain: "cvrepost.firebaseapp.com",
-            projectId: "cvrepost",
-            storageBucket: "cvrepost.firebasestorage.app",
-            messagingSenderId: "589389629114",
-            appId: "1:589389629114:web:fa9608b2f239d722936483"
+            apiKey: "AIzaSyC0fABYAvvrASpWTi9XW06S6cNPU_6BhV0",
+            authDomain: "studio-portofolio.firebaseapp.com",
+            projectId: "studio-portofolio",
+            storageBucket: "studio-portofolio.firebasestorage.app",
+            messagingSenderId: "875794099339",
+            appId: "1:875794099339:web:0a7b84dcbc41f2e318788e"
         });
         const auth = getAuth(app);
         const db = getFirestore(app);
