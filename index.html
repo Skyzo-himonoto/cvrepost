@@ -569,6 +569,16 @@
         </div>
     </div>
 
+    <div id="kategori-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden p-4 overflow-y-auto" onclick="if(event.target===this)closeModal('kategori-modal')">
+        <div class="modal-box max-w-2xl mx-auto dynamic-card border dynamic-border rounded-3xl p-6 md:p-8 space-y-6 relative shadow-2xl my-8">
+            <div class="flex items-center justify-between">
+                <h3 id="kategori-title" class="text-xl font-bold dynamic-text"></h3>
+                <button onclick="closeModal('kategori-modal')" class="btn-anim dynamic-muted"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="kategori-list" class="space-y-4"></div>
+        </div>
+    </div>
+
     <div id="toast" class="fixed bottom-6 right-6 z-[60] transform translate-y-24 opacity-0 px-5 py-3.5 rounded-2xl dynamic-card border dynamic-border dynamic-text text-sm font-medium shadow-2xl flex items-center space-x-3">
         <div class="w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-500 flex-shrink-0">
             <i data-lucide="check" class="w-4 h-4"></i>
@@ -642,6 +652,41 @@
             return { type: 'web' };
         }
 
+        // Kategori karya
+        const KATEGORI = [
+            { key: 'robotika', label: 'Robotika', desc: 'Perakitan alat & elektronika' },
+            { key: 'website', label: 'Website', desc: 'Aplikasi & situs web' },
+            { key: '3d', label: 'Desain 3D', desc: 'Model & rangkaian Tinkercad' }
+        ];
+        // Proyek lama tanpa kategori: tebak dari link
+        function kategoriOf(p) {
+            return p.kategori || (parseProjectLink(p.url).type === 'tinkercad' ? '3d' : 'website');
+        }
+        window.openKategori = function (key) {
+            const info = KATEGORI.find(k => k.key === key);
+            const items = portfolioData.projects.filter(p => kategoriOf(p) === key);
+            document.getElementById('kategori-title').innerText = info.label;
+            let embedCount = 0;
+            document.getElementById('kategori-list').innerHTML = items.length ? items.map(p => {
+                const link = parseProjectLink(p.url);
+                let media = '';
+                if (link.type === 'tinkercad' && embedCount < 5) {
+                    embedCount++;
+                    media = `<div class="rounded-2xl overflow-hidden border dynamic-border aspect-video">
+                        <iframe src="${escHtml(link.embed)}" class="w-full h-full" loading="lazy" allowfullscreen title="${escHtml(p.title)}"></iframe>
+                    </div>`;
+                }
+                return `<div class="p-5 rounded-2xl dynamic-card border dynamic-border space-y-3">
+                    ${media}
+                    <h4 class="font-bold dynamic-text">${escHtml(p.title)}</h4>
+                    <p class="text-sm dynamic-muted leading-relaxed">${escHtml(p.desc)}</p>
+                    ${p.url ? `<a href="${escHtml(p.url)}" target="_blank" rel="noopener" class="btn-anim inline-block px-4 py-2 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-sm font-bold">Buka</a>` : ''}
+                </div>`;
+            }).join('') : '<p class="text-sm dynamic-muted">Belum ada karya di kategori ini.</p>';
+            openModal('kategori-modal');
+            icons();
+        };
+
         // Render Data ke DOM
         function renderPortfolio() {
             const d = portfolioData;
@@ -670,32 +715,19 @@
                 </div>
             `).join('');
 
-            document.getElementById('projects-container').innerHTML = (() => {
-                let embedCount = 0;
-                return d.projects.map((proj, idx) => {
-                    const link = parseProjectLink(proj.url);
-                    let media = '';
-                    if (link.type === 'tinkercad' && embedCount < 5) {
-                        embedCount++;
-                        media = `<div class="rounded-2xl overflow-hidden border dynamic-border aspect-video bg-zinc-100 dark:bg-zinc-900" onclick="event.stopPropagation()">
-                            <iframe src="${escHtml(link.embed)}" class="w-full h-full" loading="lazy" allowfullscreen title="${escHtml(proj.title)}"></iframe>
-                        </div>`;
-                    }
-                    const badge = { tinkercad: 'Tinkercad', github: 'GitHub', web: 'Website' }[link.type] || '';
-                    return `<div class="reveal card-anim group p-6 rounded-3xl dynamic-card border dynamic-border space-y-4 shadow-sm" style="transition-delay:${idx * 150}ms" onclick="openProject(${idx})">
-                        ${media}
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 rounded-full dynamic-card border dynamic-border dynamic-muted text-xs font-semibold shadow-sm">${escHtml(proj.tag)}</span>
-                            <div class="w-10 h-10 rounded-xl dynamic-card border dynamic-border flex items-center justify-center dynamic-muted transition-transform duration-300 group-hover:rotate-45 shadow-sm">
-                                <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
-                            </div>
+            document.getElementById('projects-container').innerHTML = KATEGORI.map((k, idx) => {
+                const count = d.projects.filter(p => kategoriOf(p) === k.key).length;
+                return `<div class="reveal card-anim group p-8 rounded-3xl dynamic-card border dynamic-border space-y-4 shadow-sm" style="transition-delay:${idx * 150}ms" onclick="openKategori('${k.key}')">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 rounded-full dynamic-card border dynamic-border dynamic-muted text-xs font-semibold shadow-sm">${count} karya</span>
+                        <div class="w-10 h-10 rounded-xl dynamic-card border dynamic-border flex items-center justify-center dynamic-muted transition-transform duration-300 group-hover:rotate-45 shadow-sm">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
                         </div>
-                        <h3 class="text-xl font-bold dynamic-text">${escHtml(proj.title)}</h3>
-                        <p class="dynamic-muted text-sm leading-relaxed">${escHtml(proj.desc)}</p>
-                        ${badge ? `<span class="inline-block text-xs font-semibold dynamic-muted">${badge}</span>` : ''}
-                    </div>`;
-                }).join('');
-            })();
+                    </div>
+                    <h3 class="text-xl font-bold dynamic-text">${k.label}</h3>
+                    <p class="dynamic-muted text-sm leading-relaxed">${k.desc}</p>
+                </div>`;
+            }).join('');
 
             document.getElementById('experience-container').innerHTML = d.experience.map((exp, idx) => `
                 <div class="reveal ${idx % 2 ? 'from-right' : 'from-left'} card-anim p-8 rounded-3xl dynamic-card border dynamic-border flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm" style="transition-delay:${idx * 150}ms" onclick="showToast('Posisi: ${escHtml(exp.role)}')">
@@ -981,6 +1013,11 @@
         function itemProyek(p = {}) {
             return `<div class="p-4 border dynamic-border rounded-xl space-y-3 item">
                 <div><label class="lbl">Judul</label><input class="field" name="p_title" value="${esc(p.title)}"></div>
+                <div><label class="lbl">Kategori</label><select class="field" name="p_kategori">
+                    <option value="robotika" ${p.kategori === 'robotika' ? 'selected' : ''}>Robotika</option>
+                    <option value="website" ${p.kategori === 'website' ? 'selected' : ''}>Website</option>
+                    <option value="3d" ${p.kategori === '3d' ? 'selected' : ''}>Desain 3D</option>
+                </select></div>
                 <div><label class="lbl">Teknologi</label><input class="field" name="p_tag" value="${esc(p.tag)}" placeholder="Next.js & TypeScript"></div>
                 <div><label class="lbl">Deskripsi</label><textarea class="field" name="p_desc" rows="2">${esc(p.desc)}</textarea></div>
                 <div><label class="lbl">Peran Saya</label><input class="field" name="p_role" value="${esc(p.role)}"></div>
@@ -1036,6 +1073,7 @@
 
             const projects = [...document.querySelectorAll('#projects-list .item')].map(el => ({
                 title: el.querySelector('[name=p_title]').value,
+                kategori: el.querySelector('[name=p_kategori]').value,
                 tag: el.querySelector('[name=p_tag]').value,
                 desc: el.querySelector('[name=p_desc]').value,
                 role: el.querySelector('[name=p_role]').value,
