@@ -593,25 +593,14 @@
         // Data default (dipakai saat belum ada data di Firestore)
         var portfolioData = {
             name: "Hydroxy.",
-            role: "Senior Fullstack Developer & UI/UX Architect",
-            bio: "Berpengalaman lebih dari 5 tahun dalam membangun aplikasi web modern berskala besar dengan performa tinggi dan desain berstandar premium.",
-            location: "Jakarta, Indonesia",
-            email: "visi4ura@gmail.com",
-            phone: "+62 899-8442-826",
-            skills: [
-                { category: "Frontend", items: ["Next.js", "TypeScript", "Tailwind CSS", "React", "Vue.js"] },
-                { category: "Backend", items: ["Node.js", "Express", "PostgreSQL", "Redis", "GraphQL"] },
-                { category: "Tools & DevOps", items: ["Git", "Docker", "AWS", "Vercel", "Figma"] }
-            ],
-            projects: [
-                { title: "SaaS Enterprise Dashboard", desc: "Platform analitik bisnis real-time dengan integrasi database terdistribusi.", tag: "Next.js & TypeScript", role: "", result: "", url: "" },
-                { title: "E-Commerce Luxury Store", desc: "Aplikasi e-commerce berkecepatan tinggi dengan sistem pembayaran aman.", tag: "React & Tailwind", role: "", result: "", url: "" },
-                { title: "AI Content Studio", desc: "Aplikasi web cerdas untuk otomatisasi pembuatan konten digital kreatif.", tag: "Fullstack Node", role: "", result: "", url: "" }
-            ],
-            experience: [
-                { period: "2022 - Sekarang", role: "Senior Fullstack Engineer", company: "PT Tech Solusi Indonesia", desc: "Memimpin tim pengembang dalam merancang arsitektur microservices dan optimasi performa web." },
-                { period: "2020 - 2022", role: "Frontend Developer", company: "Digital Creative Studio", desc: "Mengembangkan antarmuka pengguna interaktif dan responsif untuk berbagai klien global." }
-            ]
+            role: "",
+            bio: "",
+            location: "",
+            email: "",
+            phone: "",
+            skills: [],
+            projects: [],
+            experience: []
         };
 
         // Escape teks agar data dari database tidak dijalankan sebagai HTML
@@ -888,6 +877,7 @@
             "sb_publishable_IFeVfVZSF-WnCR5WRSxEmw_NmtZn1v2"
         );
 
+        const OWNER_UID = "8268c7be-ec81-4d91-a099-204301b1c934";
         let currentUser = null;
         let cloudData = null;
         let cvMeta = null;
@@ -955,7 +945,7 @@
             currentUser = session?.user ?? null;
             refreshUploadUI();
             // Jangan pakai await di dalam callback auth, karena bisa membuat request lain macet
-            if (currentUser && !viewUid) setTimeout(() => loadPortfolio(currentUser.id), 0);
+            if (!viewUid) setTimeout(() => loadPortfolio(currentUser ? currentUser.id : OWNER_UID), 0);
         });
         if (viewUid) loadPortfolio(viewUid);
 
