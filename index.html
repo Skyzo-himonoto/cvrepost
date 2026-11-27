@@ -896,10 +896,11 @@
         };
         window.logoutUser = async () => { await sb.auth.signOut(); };
 
-        sb.auth.onAuthStateChange(async (_event, session) => {
+        sb.auth.onAuthStateChange((_event, session) => {
             currentUser = session?.user ?? null;
             refreshUploadUI();
-            if (currentUser && !viewUid) await loadPortfolio(currentUser.id);
+            // Jangan pakai await di dalam callback auth, karena bisa membuat request lain macet
+            if (currentUser && !viewUid) setTimeout(() => loadPortfolio(currentUser.id), 0);
         });
         if (viewUid) loadPortfolio(viewUid);
 
