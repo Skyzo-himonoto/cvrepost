@@ -661,7 +661,7 @@
                 let media = '';
                 if (link.type === 'tinkercad' && embedCount < 5) {
                     embedCount++;
-                    media = `<div class="rounded-2xl overflow-hidden border dynamic-border aspect-video">
+                    media = `<div class="rounded-2xl overflow-hidden border dynamic-border h-[380px] bg-zinc-100 dark:bg-zinc-900">
                         <iframe src="${escHtml(link.embed)}" class="w-full h-full" loading="lazy" allowfullscreen title="${escHtml(p.title)}"></iframe>
                     </div>`;
                 }
